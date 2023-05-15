@@ -11,6 +11,7 @@ For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10. 
 Install latest OpenVINO drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
 
 ```bash
+mkdir neo
 cd neo
 wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.13463.18/intel-igc-core_1.0.13463.18_amd64.deb
 wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.13463.18/intel-igc-opencl_1.0.13463.18_amd64.deb
