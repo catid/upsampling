@@ -16,6 +16,7 @@ Technology explored in this project:
 * Exploration of L1, L2(MSE), and LPIPS loss functions.
 * Conversion to ONNX and OpenVINO IR model formats and execution on Intel CPU/GPU.
 
+There is a blog post that accompanies this project: https://catid.io/posts/upsampler/
 
 ## Example
 
