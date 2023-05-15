@@ -1,16 +1,17 @@
-# OpenVino
+# OpenVINO
 
-This is split into another project because it requires a different environment than the rest of the project.  The rest of the project uses PyTorch and CUDA, but OpenVino uses OpenCL and a different model format.
+This is split into another project because it requires a different environment than the rest of the project.  The rest of the project uses PyTorch and CUDA, but OpenVINO uses the Intel GPU and a different model format.
 
-Since this is a small model, it should work well with OpenVino.  In my testing, OpenVino runs about 5x faster than CPU, and uses OpenCL on the integrated GPU in the Intel GPU that is often ignored.  This means that it should run fast on laptops or other devices that are somewhat resource constrained, without taking resources away from other applications.
+Since this is a small model, it should work well with OpenVINO.  In my testing, OpenVINO runs about 2x faster than CPU, and uses the integrated GPU in Intel CPUs that is often ignored.  This means that it should run fast on laptops or other devices that are somewhat resource constrained, without taking resources away from other applications.
 
 ## Setup
 
-For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10.
+For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10.  It's possible that to use the iGPU you'll need to modify your BIOS or attach a Headless Ghost ( https://www.headlessghost.com/ ) to get the device to show up if you have an Nvidia GPU installed in the computer.
 
-Install latest OpenVino drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
+Install latest OpenVINO drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
 
 ```bash
+mkdir neo
 cd neo
 wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.13463.18/intel-igc-core_1.0.13463.18_amd64.deb
 wget https://github.com/intel/intel-graphics-compiler/releases/download/igc-1.0.13463.18/intel-igc-opencl_1.0.13463.18_amd64.deb
@@ -40,11 +41,11 @@ You'll need [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/in
 conda create -n openvino python=3.10
 conda activate openvino
 
-# Install OpenVino
+# Install OpenVINO
 pip install -r requirements.txt
 ```
 
-## Convert Model to OpenVino Format
+## Convert Model to OpenVINO Format
 
 At the end of training (see main README), you should have an `upsampling.onnx` file.
 
@@ -52,10 +53,10 @@ At the end of training (see main README), you should have an `upsampling.onnx` f
 mo --input_model upsampling.onnx --input "input[1,3,1..,1..]{u8}" --output_dir openvino_model --compress_to_fp16 --use_new_frontend
 ```
 
-This produces the `./openvino_model` directory with the model in OpenVino format.
+This produces the `./openvino_model` directory with the model in OpenVINO format.
 
 
-## Test Inference with Intel GPU using OpenCL
+## Test Inference with Intel GPU
 
 Note that OpenVINO Intel GPU mode has a limitation that it cannot change the input resolution without re-loading the model.  So when processing multiple files, it's helpful to have all the images be the same dimension.
 
