@@ -1,17 +1,19 @@
 # Image Upsampling with PyTorch
 
-This project trains an image upsampling model using PyTorch and the Accelerate library. The model is designed to increase the resolution of images by a factor of 2.  For the most part this is currently a replication of the results of the authors of the VapSR ( https://github.com/zhoumumu/VapSR ) super-resolution model in my own training framework.
+This project trains an image upsampling model using PyTorch and the Microsoft DeepSpeed framework. The model is designed to increase the resolution of images by a factor of 2.  For the most part this is currently a replication of the results of the authors of the VapSR ( https://github.com/zhoumumu/VapSR ) super-resolution model in my own training framework.
 
 Technology explored in this project:
 
-* Image upsampling model training and evaluation.
+* Image upsampling model training and evaluation with PSNR, SSIM, and LPIPS.
 * Dataset construction with multi-threaded Python tools.
 * Loading training data from image folders, video files, and ImageNet dataset.
 * Data loading with Nvidia DALI - Benchmarked nvJPEG2000, WebP, and PNG for lossless loading.
 * Model optimization with TorchDynamo and Inductor.
-* Model training with DeepSpeed and DistributedDataParallel using NCCL backend across a LAN cluster of nodes each with multple GPUs.
+* Model training with DeepSpeed, Accelerate and DistributedDataParallel using NCCL backend across a LAN cluster of nodes each with multple GPUs.
 * Evaluated whether OKLAB/YUV colorspace improves model performance.
 * Ablation study of different network architectures and training strategies.
+* Exploration of ImageNet and other normalization strategies, and in-network normalization.
+* Exploration of L1, L2(MSE), and LPIPS loss functions.
 * Conversion to ONNX and OpenVINO IR model formats and execution on Intel CPU/GPU.
 
 
