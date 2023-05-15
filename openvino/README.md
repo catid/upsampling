@@ -8,7 +8,7 @@ Since this is a small model, it should work well with OpenVINO.  In my testing, 
 
 For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10.  It's possible that to use the iGPU you'll need to modify your BIOS or attach a Headless Ghost ( https://www.headlessghost.com/ ) to get the device to show up if you have an Nvidia GPU installed in the computer.
 
-Install latest OpenVino drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
+Install latest OpenVINO drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
 
 ```bash
 cd neo
@@ -40,11 +40,11 @@ You'll need [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/in
 conda create -n openvino python=3.10
 conda activate openvino
 
-# Install OpenVino
+# Install OpenVINO
 pip install -r requirements.txt
 ```
 
-## Convert Model to OpenVino Format
+## Convert Model to OpenVINO Format
 
 At the end of training (see main README), you should have an `upsampling.onnx` file.
 
@@ -52,10 +52,10 @@ At the end of training (see main README), you should have an `upsampling.onnx` f
 mo --input_model upsampling.onnx --input "input[1,3,1..,1..]{u8}" --output_dir openvino_model --compress_to_fp16 --use_new_frontend
 ```
 
-This produces the `./openvino_model` directory with the model in OpenVino format.
+This produces the `./openvino_model` directory with the model in OpenVINO format.
 
 
-## Test Inference with Intel GPU using OpenCL
+## Test Inference with Intel GPU
 
 Note that OpenVINO Intel GPU mode has a limitation that it cannot change the input resolution without re-loading the model.  So when processing multiple files, it's helpful to have all the images be the same dimension.
 
