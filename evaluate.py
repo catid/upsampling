@@ -124,7 +124,7 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
         # We do layout change from NHWC to NCHW inside the model.
         # We also do normalization inside the model.
         downsampled_image = np.array(downsampled_image)
-        input_tensor = torch.from_numpy(downsampled_image).unsqueeze(0).to(device)
+        input_tensor = torch.from_numpy(downsampled_image).unsqueeze(0).permute(0, 3, 1, 2).to(device)
 
         #print(f"input_tensor.shape = {input_tensor.shape}")
         #print(f"input_tensor.dtype = {input_tensor.dtype}")
@@ -134,7 +134,7 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
             output_tensor = model(input_tensor)
 
         # Convert the tensors back to 8-bit RGB images
-        output_image_np = output_tensor.squeeze(0).cpu().numpy()
+        output_image_np = output_tensor.permute(0, 2, 3, 1).squeeze(0).cpu().numpy()
 
         #print(f"output_image_np.shape = {output_image_np.shape}")
         #print(f"output_image_np.dtype = {output_image_np.dtype}")

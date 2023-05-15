@@ -208,16 +208,16 @@ commit b27d12c527385b2014b83566be105f839fe51327
 
 I also tried LPIPS loss and mixes of LPIPS and L1 loss, but they did not improve the results either (results not shown).
 
-During training, I was only randomly flipping the images horizontally, but I found that adding random 90 degree rotations improved the results significantly almost 0.1 dB, though training took longer.
+During training, I was only randomly flipping the images horizontally, but I found that adding random 90 degree rotations improved the results significantly over 0.16 dB, though training took longer.
 
 ```
 Image rotations in data loader
-2023-05-12 16:57:25,203 [INFO] Model PSNR: 30.532850187551094 - Bicubic PSNR: 24.87192185623686
-2023-05-12 16:57:25,203 [INFO] Model SSIM: 0.9269711264478881 - Bicubic SSIM: 0.8233347716777945
-2023-05-12 16:57:25,203 [INFO] Model LPIPS: 6.968190243102842e-05 - Bicubic LPIPS: 0.0013645301913965267
+2023-05-15 18:57:32,264 [INFO] Model PSNR: 30.596167203837407 - Bicubic PSNR: 24.87192185623686
+2023-05-15 18:57:32,264 [INFO] Model SSIM: 0.9274689177510691 - Bicubic SSIM: 0.8233347716777945
+2023-05-15 18:57:32,264 [INFO] Model LPIPS: 6.428865776182942e-05 - Bicubic LPIPS: 0.0013645301913965267
 ```
 
-The gap between bicubic and model is about the same (5.66) as the VapSR paper (5.57), so I consider these results to replicate their success, though the actual numbers are different for some reason.  I did use a slightly larger model to get this higher quality, but it's a change that the authors did not consider in their paper, and I consider it to be an improvement.
+The gap between bicubic and model is about the same (5.72) as the VapSR paper (5.57), so I consider these results to replicate their success, though the actual numbers are different for some reason.  I did use a slightly larger model to get this higher quality, but it's a change that the authors did not consider in their paper, and I consider it to be an improvement.
 
 
 ## OpenVino Inference
