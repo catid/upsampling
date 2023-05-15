@@ -17,9 +17,11 @@ Technology explored in this project:
 
 ## Example
 
-![Side-By-Side Example](sbs.png)
+Top-Left: Original Image.  Top-Right: My model output.
 
-Left: Original Image.  Second: My model output.  Third: Bicubic upsampler.  Right: Input image.
+![Side-By-Side Example](sbs4.png)
+
+Bottom-Left: Input Image.  Bottom-Right: Baseline Bicubic upsampler.
 
 
 ## Prerequisites
