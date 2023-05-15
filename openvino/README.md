@@ -1,12 +1,12 @@
-# OpenVino
+# OpenVINO
 
-This is split into another project because it requires a different environment than the rest of the project.  The rest of the project uses PyTorch and CUDA, but OpenVino uses OpenCL and a different model format.
+This is split into another project because it requires a different environment than the rest of the project.  The rest of the project uses PyTorch and CUDA, but OpenVINO uses the Intel GPU and a different model format.
 
-Since this is a small model, it should work well with OpenVino.  In my testing, OpenVino runs about 5x faster than CPU, and uses OpenCL on the integrated GPU in the Intel GPU that is often ignored.  This means that it should run fast on laptops or other devices that are somewhat resource constrained, without taking resources away from other applications.
+Since this is a small model, it should work well with OpenVINO.  In my testing, OpenVINO runs about 2x faster than CPU, and uses the integrated GPU in Intel CPUs that is often ignored.  This means that it should run fast on laptops or other devices that are somewhat resource constrained, without taking resources away from other applications.
 
 ## Setup
 
-For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10.
+For testing I'm using an Intel NUC (no GPU) running latest Ubuntu Server 22.10.  It's possible that to use the iGPU you'll need to modify your BIOS or attach a Headless Ghost ( https://www.headlessghost.com/ ) to get the device to show up if you have an Nvidia GPU installed in the computer.
 
 Install latest OpenVino drivers for Ubuntu from https://github.com/intel/compute-runtime/releases and :
 
