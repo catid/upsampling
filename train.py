@@ -181,8 +181,8 @@ def main(args):
     num_loader_threads = os.cpu_count()//2
     seed = 0
     downsample_factor = 2
-    crop_w = 256
-    crop_h = 256
+    crop_w = 128
+    crop_h = 128
 
     if True:
         train_loader = UpsamplingDataLoader(
