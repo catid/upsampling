@@ -1,0 +1,14 @@
+authorName: catid
+experimentName: upsampling
+trialConcurrency: 1
+maxExecDuration: 1h
+maxTrialNum: 100
+# The directory for keeping the experiment metadata
+logDir: ./log
+trainingServicePlatform: local
+searchSpacePath: search_space.json
+# The script for running the trial (nni will run this script)
+trial:
+  command: deepspeed -H hostfile train.py --deepspeed
+  codeDir: ./
+  gpuNum: 0

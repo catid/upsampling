@@ -1,0 +1,27 @@
+torch
+torchvision
+accelerate
+opencv-python-headless
+av
+ffmpeg-python
+cachetools
+tqdm
+colorama
+glymur
+crudexml
+cupy-cuda117
+deepspeed
+mpi4py
+nni
+lightning[extra]
+tensorboard
+nvidia-dali-cuda110
+deepspeed
+scikit-image
+lpips
+scipy
+
+# Convert to ONNX
+onnx
+onnxconverter-common
+onnxruntime-tools

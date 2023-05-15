@@ -1,0 +1,3 @@
+gpu3.lan:2
+gpu4.lan:2
+gpu5.lan:2

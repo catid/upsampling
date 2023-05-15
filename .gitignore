@@ -1,0 +1,10 @@
+*.png
+*.jp2
+*.mp4
+*.mkv
+*.pyc
+build/
+*.txt
+logs/
+lightning_data/
+output_model/

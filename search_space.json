@@ -1,0 +1,7 @@
+{
+  "num_feat": {"_type": "choice", "_value": [32, 48, 64, 96, 128]},
+  "num_block": {"_type": "randint", "_value": [20, 30]},
+  "d_atten": {"_type": "choice", "_value": [32, 48, 64, 96, 128]},
+  "conv_groups": {"_type": "choice", "_value": [1, 2]},
+  "learning_rate": {"_type": "loguniform", "_value": [1e-5, 1e-1]}
+}
