@@ -217,6 +217,14 @@ Image rotations in data loader
 2023-05-15 18:57:32,264 [INFO] Model LPIPS: 6.428865776182942e-05 - Bicubic LPIPS: 0.0013645301913965267
 ```
 
+I tried using smaller 128x128 crops instead of 256x256 crops and using a 4x larger batch size, with the intuition that it might lead to better generalization.  The results were not as good:
+
+```
+2023-05-16 00:43:52,728 [INFO] Model PSNR: 30.464718024898396 - Bicubic PSNR: 24.87192185623686
+2023-05-16 00:43:52,728 [INFO] Model SSIM: 0.9261055387180951 - Bicubic SSIM: 0.8233347716777945
+2023-05-16 00:43:52,728 [INFO] Model LPIPS: 6.534671619856208e-05 - Bicubic LPIPS: 0.0013645301913965267
+```
+
 The gap between bicubic and model is about the same (5.72) as the VapSR paper (5.57), so I consider these results to replicate their success, though the actual numbers are different for some reason.  I did use a slightly larger model to get this higher quality, but it's a change that the authors did not consider in their paper, and I consider it to be an improvement.
 
 
