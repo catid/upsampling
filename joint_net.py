@@ -79,6 +79,7 @@ class tiny_sr2(nn.Module):
         feat = self.ds(rgb_sd)
 
         # Apply residual block(s)
+        # FIXME: Try using torch.dot(a, b) instead of adding
         feat = self.rb(feat) + feat
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution

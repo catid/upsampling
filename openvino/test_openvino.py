@@ -79,8 +79,8 @@ def main():
 
     # Note: Intel GPU only supports fixed-size input
     # https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_GPU.html#dynamic-shapes
-    w = 256
-    h = 256
+    w = 512
+    h = 512
 
     model.reshape({'input': [1, 3, h, w]})
 

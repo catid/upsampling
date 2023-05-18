@@ -4,13 +4,14 @@ import onnx
 from onnxconverter_common import float16
 
 from upsampling_net import create_vapsr2x
+from joint_net import create_joint2x
 
 import logging
 from tools.logging_tools import setup_colored_logging
 setup_colored_logging()
 
 def load_model(model_path):
-    model = create_vapsr2x(rgb8output=True)
+    model = create_joint2x(rgb8output=True)
     model.load_state_dict(torch.load(model_path))
     model.half().eval().cuda()
     return model
