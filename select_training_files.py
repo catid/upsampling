@@ -57,7 +57,7 @@ def main():
                         help="Path to the dataset directory (default: ~/dataset/)")
     parser.add_argument("--max-training-files", type=int, default=1000000,
                         help="Maximum number of files to include in the training set")
-    parser.add_argument("--max-validation-files", type=int, default=10000,
+    parser.add_argument("--max-validation-files", type=int, default=20000,
                         help="Maximum number of files to include in the validation set")
 
     args = parser.parse_args()
