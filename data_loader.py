@@ -45,6 +45,10 @@ def png_pipeline(data_dir=None, file_list=None, mode="training", downsample_fact
     #    output_type=types.YCbCr)
 
     if mode == 'training':
+        # Data Augmentations for Training:
+
+        # Pick a random 256x256 crop from each 512x512 image
+        # Mirror the images horizontally 40% of the time
         images = fn.crop_mirror_normalize(
             decoded_images,
             device="gpu",
@@ -53,16 +57,18 @@ def png_pipeline(data_dir=None, file_list=None, mode="training", downsample_fact
             crop_pos_x=fn.random.uniform(range=(0.0, 1.0)),
             crop_pos_y=fn.random.uniform(range=(0.0, 1.0)),
             output_layout=types.NHWC,
-            mirror=1)
+            mirror=fn.random.coin_flip(probability=0.4))
 
-        # Add random rotation at multiples of 90
-        angle = fn.random.uniform(range=(0, 4), dtype=dali.types.INT32)
-        angle = angle * 90.0
+        # 20% of the time, apply random brightness adjust betwen 50% and 120%
+        brightness = 1.0 + fn.random.coin_flip(probability=0.2) * fn.random.uniform(range=(-0.5, 0.2))
+        images = fn.brightness(images, device="gpu", brightness=brightness)
 
-        images = fn.rotate(images, angle=angle, device="gpu")
+        # 50% of the time, apply a random rotation of 90, 180, or 270 degrees
+        angle = fn.random.coin_flip(probability=0.5) * fn.random.uniform(range=(1, 4), dtype=dali.types.INT32) * 90.0
+        images = fn.rotate(images, device="gpu", angle=angle)
 
         # Convert to NCHW
-        normalized_full_images = fn.transpose(images, perm=[2, 0, 1])
+        normalized_full_images = fn.transpose(images, device="gpu", perm=[2, 0, 1])
     else:
         normalized_full_images = fn.crop_mirror_normalize(
             decoded_images,
