@@ -18,6 +18,7 @@ import argparse
 
 from upsampling_net import create_vapsr2x
 from joint_net import create_joint2x
+
 from data_loader import UpsamplingDataLoader
 #from ffcv_data_loader import FfcvUpsamplingDataLoader
 
@@ -250,7 +251,7 @@ def main(args):
         forward_and_loss = ref_forward_and_loss_fp16
     else:
         forward_and_loss = ref_forward_and_loss_fp32
-    forward_and_loss = dynamo.optimize("eager")(forward_and_loss)
+    forward_and_loss = dynamo.optimize("inductor")(forward_and_loss)
 
     # Initialize training
 
