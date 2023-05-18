@@ -208,7 +208,7 @@ commit b27d12c527385b2014b83566be105f839fe51327
 
 I also tried LPIPS loss and mixes of LPIPS and L1 loss, but they did not improve the results either (results not shown).
 
-During training, I was only randomly flipping the images horizontally, but I found that adding random 90 degree rotations improved the results significantly over 0.16 dB, though training took longer.
+I found that adding random 90 degree rotations during training improved the results significantly over 0.16 dB, though training took longer.
 
 ```
 Image rotations in data loader
@@ -225,7 +225,19 @@ I tried using smaller 128x128 crops instead of 256x256 crops and using a 4x larg
 2023-05-16 00:43:52,728 [INFO] Model LPIPS: 6.534671619856208e-05 - Bicubic LPIPS: 0.0013645301913965267
 ```
 
-The gap between bicubic and model is about the same (5.72) as the VapSR paper (5.57), so I consider these results to replicate their success, though the actual numbers are different for some reason.  I did use a slightly larger model to get this higher quality, but it's a change that the authors did not consider in their paper, and I consider it to be an improvement.
+Improving the data augmentation further, the quality is significantly higher, but training time is also 11 hours instead of 5-6 hours:
+
+* 40% horizontal flip
+* 20% random brightness adjust between 50% and 120%
+* 50% random rotation of 90, 180, or 270 degrees
+
+```
+2023-05-18 16:44:34,113 [INFO] Model PSNR: 30.6207257848213 - Bicubic PSNR: 24.87192185623686
+2023-05-18 16:44:34,113 [INFO] Model SSIM: 0.9277041514352384 - Bicubic SSIM: 0.8233347716777945
+2023-05-18 16:44:34,113 [INFO] Model LPIPS: 6.412160131001836e-05 - Bicubic LPIPS: 0.0013645301913965267
+```
+
+The gap between bicubic and model is about the same (5.749) as the VapSR paper (5.57), so I consider these results to replicate their success, though the actual numbers are different due to using crops of the Urban100 test set.  I did use a slightly larger model and additional augmentations to get this higher quality, but these are changes that the authors did not consider in their paper, and I consider it to be an improvement.
 
 
 ## OpenVino Inference
