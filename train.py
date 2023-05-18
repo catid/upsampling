@@ -17,6 +17,7 @@ from deepspeed import log_dist
 import argparse
 
 from upsampling_net import create_vapsr2x
+from joint_net import create_joint2x
 from data_loader import UpsamplingDataLoader
 #from ffcv_data_loader import FfcvUpsamplingDataLoader
 
@@ -147,7 +148,7 @@ def main(args):
     )
 
     # Model and optimizer
-    model = create_vapsr2x(rgb8output=False)
+    model = create_joint2x(rgb8output=False)
 
     torch._dynamo.config.verbose = False
     torch._dynamo.config.suppress_errors = True
