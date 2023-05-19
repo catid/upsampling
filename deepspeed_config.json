@@ -24,8 +24,8 @@
     "optimizer": {
       "type": "AdamW",
       "params": {
-        "lr": 0.0008,
-        "betas": [0.9, 0.99],
+        "lr": 2e-5,
+        "betas": [0.9, 0.999],
         "eps": 1e-8,
         "weight_decay": 0.005
       }
@@ -54,6 +54,25 @@
       "reduce_scatter": true,
       "reduce_bucket_size": 2e8,
       "contiguous_gradients": true
+    },
+    "quantize_training": {
+      "enabled": true,
+      "quantize_verbose": true,
+      "quantizer_kernel": true,
+      "quantize_type": "symmetric",
+      "quantize_bits": {
+        "start_bits": 16,
+        "target_bits": 8
+      },
+      "quantize_schedule": {
+        "quantize_period": 400,
+        "schedule_offset": 0
+      },
+      "fp16_mixed_quantize": {
+        "enabled": false,
+        "quantize_change_ratio": 0.001
+      },
+      "quantize_groups": 8
     },
     "checkpoint": {
       "use_node_local_storage": true

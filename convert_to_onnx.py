@@ -1,7 +1,9 @@
 import torch
 import argparse
+
 import onnx
 from onnxconverter_common import float16
+from onnxruntime.quantization import quantize_dynamic, QuantType
 
 from upsampling_net import create_vapsr2x
 from joint_net import create_joint2x
