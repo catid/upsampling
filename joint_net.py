@@ -58,6 +58,9 @@ class SRB(nn.Module):
             nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=True, groups=channels), # Depthwise convolution
             nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=True), # Pointwise convolution
             nn.ReLU(inplace=True),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=True, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=True), # Pointwise convolution
+            nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
@@ -66,14 +69,27 @@ class SRB(nn.Module):
         x = x + shorcut
         return x
 
+class SpaceToDepthModule(nn.Module):
+    def __init__(self, remove_model_jit=False):
+        super().__init__()
+
+    def forward(self, x):
+        N, C, H, W = x.size()
+        x = x.view(N, C, H // 2, 2, W // 2, 2)
+        x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
+        x = x.view(N, C * 4, H // 2, W // 2)
+        return x
+
 class tiny_sr2(nn.Module):
-    def __init__(self, rgb8output=True, channels=32, blocks=2):
+    def __init__(self, rgb8output=True, channels=32, blocks=1):
         super(tiny_sr2, self).__init__()
 
         self.input_convert = FromInputRGB8()
         self.output_convert = ToOutputRGB(rgb8output=rgb8output)
 
-        self.d2s_conv = nn.Sequential(
+        self.s2d = SpaceToDepthModule()
+
+        self.conv1 = nn.Sequential(
             nn.Conv2d(3 * 2 * 2, channels, kernel_size=3, stride=1, padding=1, bias=False),
             nn.ReLU(inplace=True),
         )
@@ -86,8 +102,8 @@ class tiny_sr2(nn.Module):
         rgb = self.input_convert(rgb)
 
         # Downsample 2x and convolve
-        feat = F.pixel_unshuffle(rgb, downscale_factor=2)
-        feat = self.d2s_conv(feat)
+        feat = self.s2d(rgb)
+        feat = self.conv1(feat)
 
         # Apply residual blocks
         feat = self.body(feat)

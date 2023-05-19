@@ -251,7 +251,7 @@ def main(args):
         forward_and_loss = ref_forward_and_loss_fp16
     else:
         forward_and_loss = ref_forward_and_loss_fp32
-    #forward_and_loss = dynamo.optimize("inductor")(forward_and_loss)
+    forward_and_loss = dynamo.optimize("inductor")(forward_and_loss)
 
     # Initialize training
 
