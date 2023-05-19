@@ -48,10 +48,8 @@ class tiny_sr2(nn.Module):
         self.input_convert = FromInputRGB8()
         self.output_convert = ToOutputRGB(rgb8output=rgb8output)
 
-        # 12 = 3 (RGB) * 2 (upscale factor) * 2 (space-to-depth)
-        self.d2s = nn.Sequential(
-            nn.PixelUnshuffle(2),
-            nn.Conv2d(12, channels, kernel_size=3, stride=1, padding=1, bias=False),
+        self.d2s_conv = nn.Sequential(
+            nn.Conv2d(3 * 2 * 2, channels, kernel_size=3, stride=1, padding=1, bias=False),
             nn.ReLU(inplace=True),
         )
 
@@ -70,7 +68,8 @@ class tiny_sr2(nn.Module):
         rgb = self.input_convert(rgb)
 
         # Downsample 2x and convolve
-        feat = self.d2s(rgb)
+        feat = F.pixel_unshuffle(rgb, downscale_factor=2)
+        feat = self.d2s_conv(feat)
 
         # Apply residual block(s)
         feat = self.rb(feat) + feat
@@ -78,6 +77,9 @@ class tiny_sr2(nn.Module):
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         out = self.d2s(feat)
+
+        # Force network to learn a residual on top of bilinear upsampling
+        out = F.interpolate(rgb, scale_factor=2, antialias=True, mode='bicubic') + out
 
         out = self.output_convert(out)
 
