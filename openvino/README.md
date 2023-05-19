@@ -50,7 +50,7 @@ pip install -r requirements.txt
 At the end of training (see main README), you should have an `upsampling.onnx` file.
 
 ```bash
-mo --input_model upsampling.onnx --input "input[1,3,1..,1..]{u8}" --output_dir openvino_model --compress_to_fp16 --use_new_frontend
+python convert_model.py
 ```
 
 This produces the `./openvino_model` directory with the model in OpenVINO format.

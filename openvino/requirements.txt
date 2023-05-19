@@ -1,5 +1,3 @@
 einops
 
 openvino
-openvino-dev
-openvino-workbench
