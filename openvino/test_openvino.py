@@ -24,7 +24,7 @@ def process_image(compiled_model, input_path, output_path, w, h):
     input_image_np = einops.rearrange(input_image_np, 'b (h p1) (w p2) c -> b (c p1 p2) h w', p1=2, p2=2)
 
     # The output would be your upscaled image
-    #print("Inference input shape:", input_image_np.shape)
+    print("Inference input shape:", input_image_np.shape)
 
     t0 = time.time()
 
@@ -84,7 +84,15 @@ def main():
     w = 1920//2
     h = 1080//2
 
-    model.reshape({'input': [1, 3, h, w]})
+    # Note the model input is expected to be in a weird shape.
+    # First off, it should be NCHW, not NHWC.  This is opposite the usual layout of RGB images.
+    # Secondly, the model expects that the CPU has effectively already performed:
+    # F.pixel_unshuffle(rgb, downscale_factor=2)
+    # This is reasonable because moving memory arround to get to BCHW has to be done anyway,
+    # so we might as well do the PixelUnshuffle operation at the same time.
+    # This means it does not need to be done in the critical path on GPU, where it's actually a
+    # fairly expensive operation.
+    model.reshape({'input': [1, 12, h//2, w//2]})
 
     print(f"Model input names: {model.input().names}, shape: {model.input().partial_shape}")
     print(f"Model output names: {model.output().names}, shape: {model.output().partial_shape}")
@@ -95,8 +103,7 @@ def main():
 
     ppp.input("input").tensor() \
             .set_element_type(ov.Type.u8) \
-            .set_layout(ov.Layout('NCHW')) \
-            .set_color_format(ColorFormat.RGB)
+            .set_layout(ov.Layout('NCHW'))
     # Note: .set_memory_type("GPU_SURFACE") seems to break the model somehow.
 
     ppp.input("input").model().set_layout(ov.Layout('NCHW'))
