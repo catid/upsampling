@@ -12,6 +12,7 @@ import openvino.runtime as ov
 def process_image(compiled_model, input_path, output_path, w, h):
     # Load an image with PIL
     input_image = Image.open(input_path)
+    input_image = input_image.resize((1920//2, 1080//2))
     # Convert to numpy array
     input_image_np = np.array(input_image)
 
@@ -79,8 +80,8 @@ def main():
 
     # Note: Intel GPU only supports fixed-size input
     # https://docs.openvino.ai/latest/openvino_docs_OV_UG_supported_plugins_GPU.html#dynamic-shapes
-    w = 512
-    h = 512
+    w = 1920//2
+    h = 1080//2
 
     model.reshape({'input': [1, 3, h, w]})
 
