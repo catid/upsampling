@@ -95,9 +95,6 @@ class tiny_sr2(nn.Module):
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         out = self.d2s(feat)
 
-        # Force network to learn a residual on top of bicubic upsampling
-        out = F.interpolate(rgb, scale_factor=2, antialias=True, mode='bicubic') + out
-
         out = self.output_convert(out)
 
         return out
