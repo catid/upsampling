@@ -1,3 +1,6 @@
-einops
+# For convert_model.py script
+openvino-dev[onnx]
 
+# For test_openvino.py script
+einops
 openvino
