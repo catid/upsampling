@@ -6,14 +6,14 @@ from onnxconverter_common import float16
 from onnxruntime.quantization import quantize_dynamic, QuantType
 
 from upsampling_net import create_vapsr2x
-from joint_net import create_joint2x
+from tiny_net import create_tiny2x
 
 import logging
 from tools.logging_tools import setup_colored_logging
 setup_colored_logging()
 
 def load_model(model_path):
-    model = create_joint2x(rgb8output=True)
+    model = create_tiny2x(d2sinput=True, rgb8output=True)
     model.load_state_dict(torch.load(model_path))
     model.half().eval().cuda()
     return model
@@ -21,7 +21,7 @@ def load_model(model_path):
 def main(args):
     logging.info("Loading model...")
 
-    dummy_input = torch.randn(1, 3, 224, 224).byte().cuda()
+    dummy_input = torch.randn(1, 12, 224, 224).byte().cuda()
 
     model = load_model(args.input)
 

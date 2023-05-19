@@ -20,6 +20,7 @@ deepspeed
 scikit-image
 lpips
 scipy
+einops
 
 # Convert to ONNX
 onnx

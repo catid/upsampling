@@ -4,7 +4,7 @@ import deepspeed
 import argparse
 
 from upsampling_net import create_vapsr2x
-from joint_net import create_joint2x
+from tiny_net import create_tiny2x
 
 import logging
 from tools.logging_tools import setup_colored_logging
@@ -12,7 +12,7 @@ setup_colored_logging()
 
 def main(args):
     # Initialize your model
-    model = create_joint2x(rgb8output=True)
+    model = create_tiny2x(d2sinput=True, rgb8output=True)
 
     fp16 = not args.fp32
 

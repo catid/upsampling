@@ -1,6 +1,6 @@
-import tools.normalization_factors
-
 import os
+
+import einops
 import torch
 from torchvision.transforms import ToTensor
 from PIL import Image
@@ -15,14 +15,14 @@ from torchvision.transforms import ToTensor, Normalize, Compose
 import argparse
 
 from upsampling_net import create_vapsr2x
-from joint_net import create_joint2x
+from tiny_net import create_tiny2x
 
 import logging
 from tools.logging_tools import setup_colored_logging
 setup_colored_logging()
 
 def load_model(model_path, fp16):
-    model = create_joint2x(rgb8output=True)
+    model = create_tiny2x(d2sinput=True, rgb8output=True)
     model.load_state_dict(torch.load(model_path))
     if fp16:
         model.half()
@@ -125,7 +125,13 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
         # We do layout change from NHWC to NCHW inside the model.
         # We also do normalization inside the model.
         downsampled_image = np.array(downsampled_image)
-        input_tensor = torch.from_numpy(downsampled_image).unsqueeze(0).permute(0, 3, 1, 2).to(device)
+
+        #input_tensor = torch.from_numpy(downsampled_image).unsqueeze(0).permute(0, 3, 1, 2).to(device)
+
+        # Convert the 8-bit image to model input shape on CPU
+        temp = np.expand_dims(downsampled_image, axis=0)
+        temp = einops.rearrange(temp, 'b (h p1) (w p2) c -> b (c p1 p2) h w', p1=2, p2=2)
+        input_tensor = torch.from_numpy(temp).to(device)
 
         #print(f"input_tensor.shape = {input_tensor.shape}")
         #print(f"input_tensor.dtype = {input_tensor.dtype}")

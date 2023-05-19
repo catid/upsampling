@@ -2,6 +2,7 @@ import argparse
 import os
 import time
 
+import einops
 from pathlib import Path
 import numpy as np
 from PIL import Image
@@ -16,11 +17,11 @@ def process_image(compiled_model, input_path, output_path, w, h):
     # Convert to numpy array
     input_image_np = np.array(input_image)
 
-    input_image_np = input_image_np[:h, :w]
-
-    # Reshape input
-    input_image_np = input_image_np.transpose((2, 0, 1))
+    # Reshape input from RGB with shape HxWxC to model input shape Bx(C*4)xHxW.
+    # Note this is also doing a PixelUnshuffle(2) operation on the image, which is more efficient than doing it inside the model.
+    # However, normalization is more efficient to do inside the model.
     input_image_np = np.expand_dims(input_image_np, axis=0)
+    input_image_np = einops.rearrange(input_image_np, 'b (h p1) (w p2) c -> b (c p1 p2) h w', p1=2, p2=2)
 
     # The output would be your upscaled image
     #print("Inference input shape:", input_image_np.shape)
@@ -34,7 +35,7 @@ def process_image(compiled_model, input_path, output_path, w, h):
     t1 = time.time()
     print(f"Inference time: {(t1 - t0)*1000.0:.3f} milliseconds")
 
-    # Remove batch dimension
+    # Reshape 8-bit RGB model output shape BxCxHxW to standard RGB image shape HxWxC
     output = np.squeeze(output, axis=0)
     output = output.transpose((1, 2, 0))
 

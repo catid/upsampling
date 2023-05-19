@@ -69,26 +69,14 @@ class SRB(nn.Module):
         x = x + shorcut
         return x
 
-class SpaceToDepthModule(nn.Module):
-    def __init__(self, remove_model_jit=False):
-        super().__init__()
-
-    def forward(self, x):
-        N, C, H, W = x.size()
-        x = x.view(N, C, H // 2, 2, W // 2, 2)
-        x = x.permute(0, 3, 5, 1, 2, 4).contiguous()
-        x = x.view(N, C * 4, H // 2, W // 2)
-        return x
-
-class tiny_sr2(nn.Module):
-    def __init__(self, rgb8output=True, channels=32, blocks=1):
-        super(tiny_sr2, self).__init__()
+class tiny2x(nn.Module):
+    def __init__(self, d2sinput=True, rgb8output=True, channels=32, blocks=1):
+        super(tiny2x, self).__init__()
 
         self.input_convert = FromInputRGB8()
         self.output_convert = ToOutputRGB(rgb8output=rgb8output)
 
-        self.s2d = SpaceToDepthModule()
-
+        self.d2sinput = d2sinput
         self.conv1 = nn.Sequential(
             nn.Conv2d(3 * 2 * 2, channels, kernel_size=3, stride=1, padding=1, bias=False),
             nn.ReLU(inplace=True),
@@ -99,10 +87,13 @@ class tiny_sr2(nn.Module):
         self.d2s = depth_to_space(channels, 3, upscale_factor=4)
 
     def forward(self, rgb):
-        rgb = self.input_convert(rgb)
+        # If d2sinput is False, then the input shape should be BCHW, where C=3
+        # If d2sinput is True, then the input shape should be BCHW, where C=12
+        if not self.d2sinput:
+            rgb = F.pixel_unshuffle(rgb, downscale_factor=2)
 
-        # Downsample 2x and convolve
-        feat = self.s2d(rgb)
+        feat = self.input_convert(rgb)
+
         feat = self.conv1(feat)
 
         # Apply residual blocks
@@ -115,8 +106,13 @@ class tiny_sr2(nn.Module):
 
         return out
 
-
-def create_joint2x(rgb8output):
-    return tiny_sr2(
+# Network expects BCHW input shape
+# d2sinput: Input channels are depth-to-space converted from 3 to 12 channels by caller
+# rgb8output: Output channels are converted to 8-bit inside the network
+# Inference mode should set both to True for performance.
+# Training mode should set both to False.
+def create_tiny2x(d2sinput, rgb8output):
+    return tiny2x(
         channels=32,
+        d2sinput=d2sinput,
         rgb8output=rgb8output)
