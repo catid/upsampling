@@ -52,13 +52,10 @@ class SRB(nn.Module):
         super().__init__()
 
         self.rb = nn.Sequential(
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=True, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
             nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=True), # Pointwise convolution
             nn.ReLU(inplace=True),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=True, groups=channels), # Depthwise convolution
-            nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=True), # Pointwise convolution
-            nn.ReLU(inplace=True),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=True, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
             nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=True), # Pointwise convolution
             nn.ReLU(inplace=True),
         )
@@ -70,7 +67,7 @@ class SRB(nn.Module):
         return x
 
 class tiny2x(nn.Module):
-    def __init__(self, d2sinput=True, rgb8output=True, channels=32, blocks=1):
+    def __init__(self, d2sinput=True, rgb8output=True, channels=32, blocks=2):
         super(tiny2x, self).__init__()
 
         self.input_convert = FromInputRGB8()
