@@ -25,3 +25,4 @@ scipy
 onnx
 onnxconverter-common
 onnxruntime-tools
+onnxruntime
