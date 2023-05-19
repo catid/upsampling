@@ -55,25 +55,6 @@
       "reduce_bucket_size": 2e8,
       "contiguous_gradients": true
     },
-    "quantize_training": {
-      "enabled": true,
-      "quantize_verbose": true,
-      "quantizer_kernel": true,
-      "quantize_type": "symmetric",
-      "quantize_bits": {
-        "start_bits": 16,
-        "target_bits": 8
-      },
-      "quantize_schedule": {
-        "quantize_period": 400,
-        "schedule_offset": 0
-      },
-      "fp16_mixed_quantize": {
-        "enabled": false,
-        "quantize_change_ratio": 0.001
-      },
-      "quantize_groups": 8
-    },
     "checkpoint": {
       "use_node_local_storage": true
     }
