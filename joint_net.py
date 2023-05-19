@@ -41,17 +41,15 @@ def depth_to_space(in_channels, out_channels, upscale_factor=4):
     relu = nn.ReLU(inplace=True)
     return nn.Sequential(*[upconv1, pixel_shuffle, relu, upconv2, pixel_shuffle])
 
-class tiny_sr2(nn.Module):
-    def __init__(self, rgb8output=True, channels=32):
-        super(tiny_sr2, self).__init__()
+def make_layer(block, n_layers, *kwargs):
+    layers = []
+    for _ in range(n_layers):
+        layers.append(block(*kwargs))
+    return nn.Sequential(*layers)
 
-        self.input_convert = FromInputRGB8()
-        self.output_convert = ToOutputRGB(rgb8output=rgb8output)
-
-        self.d2s_conv = nn.Sequential(
-            nn.Conv2d(3 * 2 * 2, channels, kernel_size=3, stride=1, padding=1, bias=False),
-            nn.ReLU(inplace=True),
-        )
+class SRB(nn.Module):
+    def __init__(self, channels):
+        super().__init__()
 
         self.rb = nn.Sequential(
             nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
@@ -62,6 +60,26 @@ class tiny_sr2(nn.Module):
             nn.ReLU(inplace=True),
         )
 
+    def forward(self, x):
+        shorcut = x.clone()
+        x = self.rb(x)
+        x = x + shorcut
+        return x
+
+class tiny_sr2(nn.Module):
+    def __init__(self, rgb8output=True, channels=32, blocks=2):
+        super(tiny_sr2, self).__init__()
+
+        self.input_convert = FromInputRGB8()
+        self.output_convert = ToOutputRGB(rgb8output=rgb8output)
+
+        self.d2s_conv = nn.Sequential(
+            nn.Conv2d(3 * 2 * 2, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.ReLU(inplace=True),
+        )
+
+        self.body = make_layer(SRB, blocks, channels)
+
         self.d2s = depth_to_space(channels, 3, upscale_factor=4)
 
     def forward(self, rgb):
@@ -71,14 +89,13 @@ class tiny_sr2(nn.Module):
         feat = F.pixel_unshuffle(rgb, downscale_factor=2)
         feat = self.d2s_conv(feat)
 
-        # Apply residual block(s)
-        feat = self.rb(feat) + feat
-        feat = self.rb(feat) + feat
+        # Apply residual blocks
+        feat = self.body(feat)
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         out = self.d2s(feat)
 
-        # Force network to learn a residual on top of bilinear upsampling
+        # Force network to learn a residual on top of bicubic upsampling
         out = F.interpolate(rgb, scale_factor=2, antialias=True, mode='bicubic') + out
 
         out = self.output_convert(out)
