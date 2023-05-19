@@ -41,11 +41,11 @@ def space_to_depth(x, block_size):
     return unfolded_x.view(N, C * block_size ** 2, H // block_size, W // block_size)
 
 def depth_to_space(in_channels, out_channels, upscale_factor=4):
-    upconv1 = nn.Conv2d(in_channels, 64, 3, 1, 1)
+    upconv1 = nn.Conv2d(in_channels, 64, 3, 1, 1, bias=False)
     pixel_shuffle = nn.PixelShuffle(2)
-    upconv2 = nn.Conv2d(16, out_channels * upscale_factor, 3, 1, 1)
-    lrelu = nn.LeakyReLU(negative_slope=0.1, inplace=True)
-    return nn.Sequential(*[upconv1, pixel_shuffle, lrelu, upconv2, pixel_shuffle])
+    upconv2 = nn.Conv2d(16, out_channels * upscale_factor, 3, 1, 1, bias=False)
+    relu = nn.ReLU(inplace=True)
+    return nn.Sequential(*[upconv1, pixel_shuffle, relu, upconv2, pixel_shuffle])
 
 class tiny_sr2(nn.Module):
     def __init__(self, rgb8output=True, channels=32):
@@ -56,15 +56,15 @@ class tiny_sr2(nn.Module):
 
         # 12 = 3 (RGB) * 2 (upscale factor) * 2 (space-to-depth)
         self.ds = nn.Sequential(
-            nn.Conv2d(12, channels, kernel_size=3, stride=1, padding=1),
-            nn.GELU(),
+            nn.Conv2d(12, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.ReLU(inplace=True),
         )
 
         self.rb = nn.Sequential(
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
-            nn.GELU(),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1),
-            nn.GELU(),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.ReLU(inplace=True),
         )
 
         self.d2s = depth_to_space(channels, 3, upscale_factor=4)
@@ -79,8 +79,7 @@ class tiny_sr2(nn.Module):
         feat = self.ds(rgb_sd)
 
         # Apply residual block(s)
-        # FIXME: Try using torch.dot(a, b) instead of adding
-        feat = self.rb(feat) + feat
+        feat = torch.dot(self.rb(feat), feat)
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         out = self.d2s(feat)
