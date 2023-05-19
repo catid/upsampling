@@ -34,12 +34,6 @@ class ToOutputRGB(nn.Module):
 
         return x
 
-
-def space_to_depth(x, block_size):
-    N, C, H, W = x.size()
-    unfolded_x = torch.nn.functional.unfold(x, block_size, stride=block_size)
-    return unfolded_x.view(N, C * block_size ** 2, H // block_size, W // block_size)
-
 def depth_to_space(in_channels, out_channels, upscale_factor=4):
     upconv1 = nn.Conv2d(in_channels, 64, 3, 1, 1, bias=False)
     pixel_shuffle = nn.PixelShuffle(2)
@@ -55,7 +49,8 @@ class tiny_sr2(nn.Module):
         self.output_convert = ToOutputRGB(rgb8output=rgb8output)
 
         # 12 = 3 (RGB) * 2 (upscale factor) * 2 (space-to-depth)
-        self.ds = nn.Sequential(
+        self.d2s = nn.Sequential(
+            nn.PixelUnshuffle(2),
             nn.Conv2d(12, channels, kernel_size=3, stride=1, padding=1, bias=False),
             nn.ReLU(inplace=True),
         )
@@ -74,11 +69,8 @@ class tiny_sr2(nn.Module):
     def forward(self, rgb):
         rgb = self.input_convert(rgb)
 
-        # Downsample the image by a factor of 2, converting to feature channels (without any convolution yet)
-        rgb_sd = space_to_depth(rgb, 2)
-
-        # Apply convolution to convert to ~32 feature channels
-        feat = self.ds(rgb_sd)
+        # Downsample 2x and convolve
+        feat = self.d2s(rgb)
 
         # Apply residual block(s)
         feat = self.rb(feat) + feat
