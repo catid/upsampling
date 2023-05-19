@@ -67,7 +67,7 @@ class tiny_sr2(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.d2s = depth_to_space(channels, 3, upscale_factor=4)
+        self.d2s = depth_to_space(channels * 2, 3, upscale_factor=4)
 
     def forward(self, rgb):
         rgb = self.input_convert(rgb)
@@ -79,7 +79,7 @@ class tiny_sr2(nn.Module):
         feat = self.ds(rgb_sd)
 
         # Apply residual block(s)
-        feat = torch.dot(self.rb(feat), feat)
+        feat = torch.cat((self.rb(feat), feat), dim=1)
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         out = self.d2s(feat)
