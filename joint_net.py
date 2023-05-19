@@ -61,9 +61,13 @@ class tiny_sr2(nn.Module):
         )
 
         self.rb = nn.Sequential(
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            #nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
             nn.ReLU(inplace=True),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            #nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
             nn.ReLU(inplace=True),
         )
 
