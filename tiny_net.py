@@ -55,14 +55,12 @@ class SRB(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.fb = nn.Sequential(
-            nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False),
-        )
+        self.skip_mix = nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False)
 
     def forward(self, x):
-        shortcut = x.clone()
+        skip = x.clone()
         x = self.rb(x)
-        x = self.fb(torch.cat((x, shortcut), dim=1))
+        x = self.skip_mix(torch.cat((x, skip), dim=1))
         return x
 
 class tiny2x(nn.Module):
