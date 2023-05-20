@@ -372,7 +372,7 @@ if __name__ == "__main__":
     parser.add_argument("--local_rank", type=int, default=-1)
     parser.add_argument("--dataset-dir", type=str, default=str(Path.home() / "dataset"), help="Path to the dataset directory (default: ~/dataset/)")
     parser.add_argument("--max-epochs", type=int, default=1000000, help="Maximum epochs to train")
-    parser.add_argument("--patience", type=int, default=200, help="Patience for validation loss not decreasing before early stopping")
+    parser.add_argument("--patience", type=int, default=300, help="Patience for validation loss not decreasing before early stopping")
     parser.add_argument("--nni", action="store_true", help="Enable NNI mode")
     parser.add_argument("--output-dir", type=str, default="output_model", help="Path to the output trained model")
     parser.add_argument("--log-dir", type=str, default="tb_logs", help="Path to the Tensorboard logs")
