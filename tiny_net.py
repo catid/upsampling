@@ -55,7 +55,10 @@ class SRB(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-        self.skip_mix = nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False)
+        self.skip_mix = nn.Sequential(
+            nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False),
+            nn.ReLU(inplace=True),
+        )
 
     def forward(self, x):
         skip = x.clone()
