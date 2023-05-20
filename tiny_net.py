@@ -60,7 +60,7 @@ class SRB(nn.Module):
         return x
 
 class tiny2x(nn.Module):
-    def __init__(self, d2sinput=True, rgb8output=True, channels=48, blocks=1):
+    def __init__(self, d2sinput=True, rgb8output=True, channels=32, blocks=1):
         super(tiny2x, self).__init__()
 
         self.input_convert = FromInputRGB8()
@@ -115,5 +115,6 @@ class tiny2x(nn.Module):
 def create_tiny2x(d2sinput, rgb8output):
     return tiny2x(
         channels=32,
+        blocks=1,
         d2sinput=d2sinput,
         rgb8output=rgb8output)
