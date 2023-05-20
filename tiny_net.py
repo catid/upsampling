@@ -52,13 +52,17 @@ class SRB(nn.Module):
             nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
             #nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
             #nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
+        )
+
+        self.fb = nn.Sequential(
+            nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False),
             nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
-        shorcut = x.clone()
+        shortcut = x.clone()
         x = self.rb(x)
-        x = x + shorcut
+        x = self.fb(torch.cat((x, shortcut), dim=1))
         return x
 
 class tiny2x(nn.Module):
