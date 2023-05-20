@@ -45,6 +45,7 @@ class SRB(nn.Module):
         super().__init__()
 
         self.rb = nn.Sequential(
+            nn.ReLU(inplace=True),
             nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False),
             #nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
             #nn.Conv2d(channels, channels, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
@@ -56,7 +57,6 @@ class SRB(nn.Module):
 
         self.fb = nn.Sequential(
             nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False),
-            nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
