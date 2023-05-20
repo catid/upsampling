@@ -34,13 +34,6 @@ class ToOutputRGB(nn.Module):
 
         return x
 
-def depth_to_space(in_channels, out_channels, upscale_factor=4):
-    upconv1 = nn.Conv2d(in_channels, 64, 3, 1, 1, bias=False)
-    pixel_shuffle = nn.PixelShuffle(2)
-    upconv2 = nn.Conv2d(16, out_channels * upscale_factor, 3, 1, 1, bias=False)
-    relu = nn.ReLU(inplace=True)
-    return nn.Sequential(*[upconv1, pixel_shuffle, relu, upconv2, pixel_shuffle])
-
 def make_layer(block, n_layers, *kwargs):
     layers = []
     for _ in range(n_layers):
@@ -81,7 +74,18 @@ class tiny2x(nn.Module):
 
         self.body = make_layer(SRB, blocks, channels)
 
-        self.d2s = depth_to_space(channels, 3, upscale_factor=4)
+        # Upsample the image by 4x to convert from features to RGB at twice original resolution
+        self.d2s = nn.Sequential(
+            #nn.Conv2d(channels, 64, 3, 1, 1, bias=False),
+            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
+            nn.Conv2d(channels, 64, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
+            nn.PixelShuffle(2),
+            nn.ReLU(inplace=True),
+            #nn.Conv2d(16, 3 * 4, 3, 1, 1, bias=False),
+            nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
+            nn.Conv2d(16, 3 * 4, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
+            nn.PixelShuffle(2),
+        )
 
     def forward(self, rgb):
         # If d2sinput is False, then the input shape should be BCHW, where C=3
