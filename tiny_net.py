@@ -76,14 +76,10 @@ class tiny2x(nn.Module):
 
         # Upsample the image by 4x to convert from features to RGB at twice original resolution
         self.d2s = nn.Sequential(
-            #nn.Conv2d(channels, 64, 3, 1, 1, bias=False),
-            nn.Conv2d(channels, channels, kernel_size=3, stride=1, padding=1, bias=False, groups=channels), # Depthwise convolution
-            nn.Conv2d(channels, 64, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
+            nn.Conv2d(channels, 64, 3, 1, 1, bias=False),
             nn.PixelShuffle(2),
             nn.ReLU(inplace=True),
-            #nn.Conv2d(16, 3 * 4, 3, 1, 1, bias=False),
-            nn.Conv2d(16, 16, kernel_size=3, stride=1, padding=1, bias=False, groups=16), # Depthwise convolution
-            nn.Conv2d(16, 3 * 4, kernel_size=1, stride=1, padding=0, bias=False), # Pointwise convolution
+            nn.Conv2d(16, 3 * 4, 3, 1, 1, bias=False),
             nn.PixelShuffle(2),
         )
 
