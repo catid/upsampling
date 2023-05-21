@@ -57,7 +57,7 @@ class SRB(nn.Module):
 
         self.skip_mix = nn.Sequential(
             nn.Conv2d(channels*2, channels, kernel_size=1, stride=1, padding=0, bias=False),
-            nn.ReLU(inplace=True),
+            #nn.ReLU(inplace=True),
         )
 
     def forward(self, x):
