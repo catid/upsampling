@@ -1,3 +1,10 @@
+# Tiny Model
+
+Blog post for the tiny model: https://catid.io/posts/tiny_sr/
+
+The remainder of this README is unchanged from the master branch.
+
+
 # Image Upsampling with PyTorch
 
 This project trains an image upsampling model using PyTorch and the Microsoft DeepSpeed framework. The model is designed to increase the resolution of images by a factor of 2.  For the most part this is currently a replication of the results of the authors of the VapSR ( https://github.com/zhoumumu/VapSR ) super-resolution model in my own training framework.

@@ -31,10 +31,18 @@ def main(args):
         "train_batch_size": 1,
     }
 
+    deepspeed.init_distributed(
+        auto_mpi_discovery=True,
+        distributed_port=29555,
+        init_method="tcp://localhost:29555",
+        rank=0,
+        world_size=1)
+
     ds_model, _, _, _ = deepspeed.initialize(config=config_dict,
                                              model=model,
                                              model_parameters=model.parameters(),
-                                             optimizer=None)
+                                             optimizer=None,
+                                             dist_init_required=False)
 
     # Load Deepspeed checkpoint
     ds_model.load_checkpoint(load_dir=args.model_dir)
