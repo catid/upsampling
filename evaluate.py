@@ -1,4 +1,5 @@
 import os
+import time
 
 import einops
 import torch
@@ -70,14 +71,17 @@ def save_side_by_side(images, output_filename):
 
     # Get the dimensions of the combined image
     width, height = pil_images[0].size
-    total_width = width * len(images)
+    total_width = width * 2
+    total_height = height * ((len(pil_images) + 1) // 2)
 
     # Create a new PIL Image object for the combined image
-    combined_image = Image.new("RGB", (total_width, height))
+    combined_image = Image.new("RGB", (total_width, total_height))
 
     # Paste images side-by-side into the combined image
     for i, img in enumerate(pil_images):
-        combined_image.paste(img, (i * width, 0))
+        row = i // 2
+        col = i % 2
+        combined_image.paste(img, (col * width, row * height))
 
     # Save the combined image as a .png file
     output_path = os.path.join(output_dir, output_filename)
@@ -136,12 +140,16 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
         #print(f"input_tensor.shape = {input_tensor.shape}")
         #print(f"input_tensor.dtype = {input_tensor.dtype}")
 
+        t0 = time.time()
+
         # Upsample the image using the model
         with torch.no_grad():
             output_tensor = model(input_tensor)
 
         # Convert the tensors back to 8-bit RGB images
         output_image_np = output_tensor.permute(0, 2, 3, 1).squeeze(0).cpu().numpy()
+
+        t1 = time.time()
 
         #print(f"output_image_np.shape = {output_image_np.shape}")
         #print(f"output_image_np.dtype = {output_image_np.dtype}")
@@ -180,7 +188,7 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
         lpips_value = calculate_lpips(input_image_eval, output_image_eval, fp16=fp16)
         bicubic_lpips_value = calculate_lpips(input_image_eval, bicubic_image_eval, fp16=fp16)
 
-        logging.info(f"{img_path}: PSNR={psnr_value} SSIM={ssim_value} LPIPS={lpips_value}")
+        logging.info(f"{img_path}: PSNR={psnr_value} SSIM={ssim_value} LPIPS={lpips_value} t={(t1-t0) * 1000.0:.3f} msec")
 
         psnr_values.append(psnr_value)
         ssim_values.append(ssim_value)
@@ -190,7 +198,7 @@ def evaluate(model, image_directory, crop_border=4, fp16=True):
         bicubic_ssim_values.append(bicubic_ssim_value)
         bicubic_lpips_values.append(bicubic_lpips_value)
 
-        save_side_by_side([input_image_np * 255, output_image_np * 255, bicubic_image_np * 255, downsampled_image], "output_" + img_name)
+        save_side_by_side([input_image_np * 255, output_image_np * 255, downsampled_image, bicubic_image_np * 255], "output_" + img_name)
 
     return np.mean(psnr_values), np.mean(ssim_values), np.mean(lpips_values), np.mean(bicubic_psnr_values), np.mean(bicubic_ssim_values), np.mean(bicubic_lpips_values)
 
